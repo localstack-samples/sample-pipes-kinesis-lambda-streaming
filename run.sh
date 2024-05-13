@@ -1,0 +1,1 @@
+awslocal cloudformation describe-stacks --stack-name PipesStreamingStack | jq '.Stacks | .[] | .Outputs | reduce .[] as $i ({}; .[$i.OutputKey] = $i.OutputValue)'
