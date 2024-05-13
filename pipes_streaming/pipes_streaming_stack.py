@@ -31,6 +31,7 @@ class PipesStreamingStack(Stack):
             "Function",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="index.handler",
+            timeout=cdk.Duration.seconds(60),
             code=lambda_.InlineCode(code=load_file(TEST_LAMBDA_PYTHON_ENRICHMENT)),
         )
 

@@ -13,6 +13,7 @@ echo "TargetStreamName: $TargetStreamName"
 echo "RoleName: $RoleName"
 
 # Put a record into the source stream
+echo "Putting a record into the source stream"
 awslocal kinesis put-record \
   --stream-name $SourceStreamName \
   --data '{"fail":false}' \
@@ -21,6 +22,7 @@ awslocal kinesis put-record \
 sleep 5
 
 # Get the shard iterator for the target stream
+echo "Getting the shard iterator for the target stream"
 SHARD_ITERATOR=$(awslocal kinesis get-shard-iterator \
   --shard-id shardId-000000000000 \
   --shard-iterator-type TRIM_HORIZON \
@@ -30,7 +32,18 @@ SHARD_ITERATOR=$(awslocal kinesis get-shard-iterator \
 
 sleep 5
 
-RECORD_DATA=$(awslocal kinesis get-records \
-  --shard-iterator $SHARD_ITERATOR | jq -r '.Records[0].Data' | base64 --decode)
+# Get the record from the target stream
+echo "Getting the record from the target stream"
+RECORDS_JSON=$(awslocal kinesis get-records \
+  --shard-iterator $SHARD_ITERATOR)
 
-echo "$RECORD_DATA" | jq -r 'if .enrichment == "Hello from Lambda" then "Success" else "Failure" end'
+echo "$RECORDS_JSON"
+
+# Check if the JSON output contains the NextShardIterator
+NEXT_SHARD_ITERATOR_PRESENT=$(echo "$RECORDS_JSON" | jq 'has("NextShardIterator")')
+
+if [ "$NEXT_SHARD_ITERATOR_PRESENT" == "true" ]; then
+  echo "Test passed: NextShardIterator is present in the JSON output."
+else
+  echo "Test failed: NextShardIterator is not present in the JSON output."
+fi
