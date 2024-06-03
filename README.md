@@ -1,4 +1,4 @@
-# Testing EventBridge Pipes with Kinesis to Lambda to Kinesis and SQS DLQ
+# Testing EventBridge Pipes with Kinesis to Lambda to Kinesis
 
 This demo, demonstrates deploying and testing a Pipe with the following flow: Kinesis source stream to Lambda enrichment to Kinesis target stream.
 

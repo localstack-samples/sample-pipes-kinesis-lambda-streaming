@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Extract stack outputs and store them in variables
 eval $(awslocal cloudformation describe-stacks --stack-name PipesStreamingStack | jq -r '.Stacks | .[] | .Outputs | .[] | "\(.OutputKey)=\(.OutputValue)"')
