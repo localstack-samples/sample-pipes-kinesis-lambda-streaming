@@ -6,16 +6,20 @@ Users can deploy the infrastructure with AWS Cloud Development Kit (CDK), and we
 
 ## Prerequisites
 
--   LocalStack Pro with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/)
--   [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the  [`awslocal`](https://github.com/localstack/awscli-local) wrapper.
--   [CDK](https://docs.localstack.cloud/user-guide/integrations/aws-cdk/) with the  [`cdklocal`](https://github.com/localstack/aws-cdk-local) wrapper.
--   [Python](https://www.python.org/downloads/) 3.10+ or later.
+- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) to activate LocalStack.
+- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli).
+- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal`](https://github.com/localstack/awscli-local) wrapper.
+- [CDK](https://docs.localstack.cloud/user-guide/integrations/aws-cdk/) with the [`cdklocal`](https://github.com/localstack/aws-cdk-local) wrapper.
+- [Python](https://www.python.org/downloads/) 3.10+ or later.
 
-Start LocalStack Pro by setting your  `LOCALSTACK_AUTH_TOKEN`  to activate the Pro features.
+## Start LocalStack
+
+Start LocalStack with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
 
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack start -d
+make start
+make ready
 ```
 
 ## Instructions
