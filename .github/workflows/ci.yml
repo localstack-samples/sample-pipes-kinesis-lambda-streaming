@@ -27,8 +27,11 @@ jobs:
 
       - name: Install CDK
         run: |
-          npm install -g aws-cdk-local aws-cdk
-          cdklocal --version
+          npm install -g @localstack/lstk aws-cdk
+          cdk --version
+
+      - name: Configure the AWS profile
+        run: lstk setup aws
 
       - name: Set up Python 3.11
         id: setup-python
@@ -42,18 +45,15 @@ jobs:
           pip install -r requirements.txt
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@main
-        with:
-            image-tag: ${{ inputs.release-tag || 'latest'}}
-            use-pro: 'true'
-            install-awslocal: 'true'
-            configuration: DEBUG=1
         env:
             LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+        run: |
+            docker pull localstack/localstack-pro:latest
+            LOCALSTACK_DEBUG=1 lstk start
 
       - name: Deploy using CDK
         run: |
-            cdklocal bootstrap && cdklocal deploy --require-approval never
+            lstk cdk bootstrap && lstk cdk deploy --require-approval never
 
       - name: Run smoke test
         run: |

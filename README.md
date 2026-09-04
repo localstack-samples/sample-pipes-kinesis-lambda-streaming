@@ -6,10 +6,10 @@ Users can deploy the infrastructure with AWS Cloud Development Kit (CDK), and we
 
 ## Prerequisites
 
-- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) to activate LocalStack.
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli).
-- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal`](https://github.com/localstack/awscli-local) wrapper.
-- [CDK](https://docs.localstack.cloud/user-guide/integrations/aws-cdk/) with the [`cdklocal`](https://github.com/localstack/aws-cdk-local) wrapper.
+- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/aws/getting-started/auth-token/) to activate LocalStack.
+- [`lstk` CLI](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/).
+- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/), required by `lstk aws`.
+- [CDK](https://docs.localstack.cloud/user-guide/integrations/aws-cdk/), deployed via the `lstk cdk` proxy.
 - [Python](https://www.python.org/downloads/) 3.10+ or later.
 
 ## Start LocalStack
@@ -19,7 +19,6 @@ Start LocalStack with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 make start
-make ready
 ```
 
 ## Instructions
@@ -49,8 +48,8 @@ pip install -r requirements.txt
 To deploy the infrastructure, you can run the following command:
 
 ```bash
-cdklocal bootstrap aws://000000000000/us-east-1
-cdklocal deploy
+lstk cdk bootstrap aws://000000000000/us-east-1
+lstk cdk deploy
 ```
 
 > Note: Make sure your region is set to `us-east-1` in your AWS CLI configuration. Alternatively you can adjust the bootstrap command to match your region. The region in the Makefile is also set to `us-east-1` and might need changing.
@@ -77,13 +76,13 @@ arn:aws:cloudformation:us-east-1:000000000000:stack/PipesStreamingStack/daa159bc
 Run the following command to extract stack outputs:
 
 ```bash
-eval $(awslocal cloudformation describe-stacks --stack-name PipesStreamingStack | jq -r '.Stacks | .[] | .Outputs | .[] | "\(.OutputKey)=\(.OutputValue)"')
+eval $(lstk aws cloudformation describe-stacks --stack-name PipesStreamingStack | jq -r '.Stacks | .[] | .Outputs | .[] | "\(.OutputKey)=\(.OutputValue)"')
 ```
 
 Put a record in the source stream:
 
 ```bash
-awslocal kinesis put-record \
+lstk aws kinesis put-record \
   --stream-name $SourceStreamName \
   --data '{"fail":false}' \
   --partition-key my-partition-key
@@ -92,7 +91,7 @@ awslocal kinesis put-record \
 Get the shard iterator from the target stream:
 
 ```bash
-SHARD_ITERATOR=$(awslocal kinesis get-shard-iterator \
+SHARD_ITERATOR=$(lstk aws kinesis get-shard-iterator \
   --shard-id shardId-000000000000 \
   --shard-iterator-type TRIM_HORIZON \
   --stream-name $TargetStreamName \
@@ -103,7 +102,7 @@ SHARD_ITERATOR=$(awslocal kinesis get-shard-iterator \
 Get the records from the target stream:
 
 ```bash
-awslocal kinesis get-records \
+lstk aws kinesis get-records \
   --shard-iterator $SHARD_ITERATOR
 ```
 
