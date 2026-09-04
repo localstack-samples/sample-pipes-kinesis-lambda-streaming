@@ -83,6 +83,7 @@ Put a record in the source stream:
 
 ```bash
 lstk aws kinesis put-record \
+  --cli-binary-format raw-in-base64-out \
   --stream-name $SourceStreamName \
   --data '{"fail":false}' \
   --partition-key my-partition-key
