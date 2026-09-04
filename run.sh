@@ -2,7 +2,7 @@
 set -e
 
 # Extract stack outputs and store them in variables
-eval $(awslocal cloudformation describe-stacks --stack-name PipesStreamingStack | jq -r '.Stacks | .[] | .Outputs | .[] | "\(.OutputKey)=\(.OutputValue)"')
+eval $(lstk aws cloudformation describe-stacks --stack-name PipesStreamingStack | jq -r '.Stacks | .[] | .Outputs | .[] | "\(.OutputKey)=\(.OutputValue)"')
 
 # Print the variables to confirm they have been set correctly
 echo "PipeName: $PipeName"
@@ -15,7 +15,8 @@ echo "RoleName: $RoleName"
 
 # Put a record into the source stream
 echo "Putting a record into the source stream"
-awslocal kinesis put-record \
+lstk aws kinesis put-record \
+  --cli-binary-format raw-in-base64-out \
   --stream-name $SourceStreamName \
   --data '{"fail":false}' \
   --partition-key my-partition-key
@@ -24,7 +25,7 @@ sleep 5
 
 # Get the shard iterator for the target stream
 echo "Getting the shard iterator for the target stream"
-SHARD_ITERATOR=$(awslocal kinesis get-shard-iterator \
+SHARD_ITERATOR=$(lstk aws kinesis get-shard-iterator \
   --shard-id shardId-000000000000 \
   --shard-iterator-type TRIM_HORIZON \
   --stream-name $TargetStreamName \
@@ -35,7 +36,7 @@ sleep 5
 
 # Get the record from the target stream
 echo "Getting the record from the target stream"
-RECORDS_JSON=$(awslocal kinesis get-records \
+RECORDS_JSON=$(lstk aws kinesis get-records \
   --shard-iterator $SHARD_ITERATOR)
 
 echo "$RECORDS_JSON"
